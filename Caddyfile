@@ -1,0 +1,13 @@
+# Замените `<your domain>` на ваш домен.
+# Caddy автоматически получит и обновит TLS-сертификат Let's Encrypt.
+
+<your domain> {
+
+    handle /api/* {
+        reverse_proxy localhost:8080
+    }
+
+    handle {
+        reverse_proxy localhost:3000
+    }
+}

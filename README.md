@@ -57,10 +57,10 @@
 
 ```
 # TCP/UDP без указания протокола источника
-2026/05/23 13:32:32.721765 from 176.113.245.210:65479 accepted tcp:www.google.com:443 [VLESS-WL-Yandex -> SS_OUTBOUND] email: 149
+2026/05/23 13:32:32.721765 from xxx.xxx.xxx.xxx:65479 accepted tcp:www.google.com:443 [VLESS-Inbound -> SS_OUTBOUND] email: 149
 
 # UDP с протоколом источника
-2026/05/23 13:32:33.444395 from tcp:176.113.245.210:24227 accepted udp:1.1.1.1:53 [VLESS-WL-Yandex -> VLESS_OUTBOUND_DE] email: 149
+2026/05/23 13:32:33.444395 from tcp:xxx.xxx.xxx.xxx:24227 accepted udp:1.1.1.1:53 [VLESS-Inbound -> VLESS_OUTBOUND_DE] email: 149
 ```
 
 ---
@@ -96,17 +96,20 @@
 ### 1. Клонируйте репозиторий
 
 ```bash
-git clone https://github.com/efinskiy/xrayaccess.git
-cd xrayaccess
+git clone https://github.com/efinskiy/xrayaccess.git /etc/xrayaccess
+cd /etc/xrayaccess
 ```
 
 ### 2. Настройте переменные окружения
 
 ```bash
+# Сгенерируйте hex JWT секрет
+openssl rand -hex 16
+```
+```bash
 cp .env.example .env
 nano .env
 ```
-
 ```env
 POSTGRES_PASSWORD=надёжный_пароль_базы
 JWT_SECRET=случайная_строка_минимум_32_символа
@@ -127,6 +130,30 @@ docker compose up -d
 ```bash
 docker compose ps
 docker compose logs server
+```
+
+### 5. Настройка Caddy для HTTPS (требуется домен/поддомен)
+```bash
+apt update && apt upgrade -y
+apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+apt update && apt install caddy
+cp /etc/xrayaccess/Caddyfile /etc/caddy/Caddyfile
+nano /etc/caddy/Caddyfile
+```
+
+В открывшемся редакторе измените `<your domain>` на имя вашего домена (напр. subdomain.example.com)
+
+Проверьте конфиг
+```bash
+caddy validate --config /etc/caddy/Caddyfile
+```
+
+Перезапустите Caddy
+
+```bash
+systemctl reload caddy
 ```
 
 ---
@@ -228,13 +255,13 @@ mkdir -p /etc/xray-agent
 
 cat > /etc/xray-agent/config.yaml << 'EOF'
 # URL вашего дашборда (без слеша в конце)
-server_url: https://your-dashboard.example.com
+server_url: https://
 
 # API ключ из раздела "Серверы" в дашборде
-api_key: вставьте_api_ключ_сюда
+api_key: 
 
 # Путь к access логу Xray
-log_file: /var/log/xray/access.log
+log_file: /var/log/remnanode/access.log
 
 # Размер батча перед отправкой
 batch_size: 200
@@ -274,7 +301,7 @@ journalctl -u xray-agent -f
 
 ### Убедитесь что access.log включён в Xray
 
-В конфиге Xray (`/usr/local/etc/xray/config.json`) должна быть настройка:
+В конфиге Xray должна быть настройка:
 
 ```json
 {
