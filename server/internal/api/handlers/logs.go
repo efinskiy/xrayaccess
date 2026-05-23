@@ -54,7 +54,7 @@ func (h *LogsHandler) List(c *gin.Context) {
 	var total int64
 	query.Count(&total)
 
-	var entries []models.LogEntry
+	entries := make([]models.LogEntry, 0)
 	query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&entries)
 
 	c.JSON(http.StatusOK, gin.H{

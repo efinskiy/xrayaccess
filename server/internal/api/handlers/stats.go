@@ -81,7 +81,7 @@ func (h *StatsHandler) TopUsers(c *gin.Context) {
 	tr := parseTimeRange(c)
 	limit := 50
 
-	var stats []userStat
+	stats := make([]userStat, 0)
 	h.db.Raw(`
 		SELECT user_email,
 		       COUNT(*) AS requests,
@@ -121,7 +121,7 @@ func (h *StatsHandler) TopDestinations(c *gin.Context) {
 		LIMIT ?
 	`, tr.From, tr.To, userEmail, userEmail, limit)
 
-	var stats []destStat
+	stats := make([]destStat, 0)
 	query.Scan(&stats)
 	c.JSON(http.StatusOK, stats)
 }
@@ -147,7 +147,7 @@ func (h *StatsHandler) Timeline(c *gin.Context) {
 		truncate = "day"
 	}
 
-	var buckets []timelineBucket
+	buckets := make([]timelineBucket, 0)
 	h.db.Raw(`
 		SELECT DATE_TRUNC(?, timestamp) AS bucket,
 		       COUNT(*) AS requests
@@ -198,7 +198,7 @@ type inboundStat struct {
 func (h *StatsHandler) InboundStats(c *gin.Context) {
 	tr := parseTimeRange(c)
 
-	var stats []inboundStat
+	stats := make([]inboundStat, 0)
 	h.db.Raw(`
 		SELECT inbound,
 		       COUNT(*) AS requests

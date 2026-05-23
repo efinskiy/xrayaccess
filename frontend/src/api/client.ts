@@ -34,20 +34,26 @@ export const createServer = (name: string) =>
   api.post("/servers", { name }).then((r) => r.data);
 export const deleteServer = (id: string) => api.delete(`/servers/${id}`);
 
+// Go возвращает null вместо [] для пустых слайсов — нормализуем здесь
+const arr = <T>(data: T[] | null): T[] => data ?? [];
+
 // Stats
 export const getOverview = (params?: Record<string, string>) =>
   api.get("/stats/overview", { params }).then((r) => r.data);
 export const getTopUsers = (params?: Record<string, string>) =>
-  api.get("/stats/users", { params }).then((r) => r.data);
+  api.get("/stats/users", { params }).then((r) => arr(r.data));
 export const getUserDetail = (email: string, params?: Record<string, string>) =>
   api.get(`/stats/users/${encodeURIComponent(email)}`, { params }).then((r) => r.data);
 export const getTopDestinations = (params?: Record<string, string>) =>
-  api.get("/stats/destinations", { params }).then((r) => r.data);
+  api.get("/stats/destinations", { params }).then((r) => arr(r.data));
 export const getTimeline = (params?: Record<string, string>) =>
-  api.get("/stats/timeline", { params }).then((r) => r.data);
+  api.get("/stats/timeline", { params }).then((r) => arr(r.data));
 export const getInboundStats = (params?: Record<string, string>) =>
-  api.get("/stats/inbound", { params }).then((r) => r.data);
+  api.get("/stats/inbound", { params }).then((r) => arr(r.data));
 
 // Logs
 export const getLogs = (params?: Record<string, string | number>) =>
-  api.get("/logs", { params }).then((r) => r.data);
+  api.get("/logs", { params }).then((r) => ({
+    ...r.data,
+    entries: arr(r.data?.entries),
+  }));
