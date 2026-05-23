@@ -1,0 +1,17 @@
+# URL вашего веб-сервиса (без слеша в конце)
+server_url: https://your-dashboard.example.com
+
+# API ключ сервера — получите в панели управления
+api_key: your-api-key-here
+
+# Путь к access логу Xray
+log_file: /var/log/xray/access.log
+
+# Максимальное количество записей в одном батче
+batch_size: 200
+
+# Интервал отправки при малом трафике
+flush_interval: 10s
+
+# Пропускать проверку TLS сертификата (только для разработки!)
+tls_skip_verify: false

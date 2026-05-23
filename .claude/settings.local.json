@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(mkdir -p /Users/finskiy/AIProjects/XrayRequestsDashboard/.claude)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm run *)",
+      "Bash(go mod *)",
+      "Bash(go build *)"
+    ]
+  }
+}
